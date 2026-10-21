@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyice — Bio Link Komunitas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 8s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px) scale(1)' },
+                            '50%': { transform: 'translateY(-12px) scale(1.03)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.7', transform: 'scale(1.08)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .link-card {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .link-card:hover {
+            transform: translateY(-5px) scale(1.015);
+        }
+        .link-card:active {
+            transform: translateY(0px) scale(0.99);
+        }
+        /* Custom animated ambient glow blobs */
+        .ambient-blob {
+            filter: blur(90px);
+            pointer-events: none;
+            position: absolute;
+            z-index: 0;
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Ambient Glowing Backgrounds -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="ambient-blob w-[380px] h-[380px] rounded-full bg-indigo-600/30 top-[-80px] left-[10%] animate-float"></div>
+        <div class="ambient-blob w-[420px] h-[420px] rounded-full bg-emerald-600/25 top-[35%] right-[-100px] animate-float" style="animation-delay: 2.5s;"></div>
+        <div class="ambient-blob w-[360px] h-[360px] rounded-full bg-amber-500/20 bottom-[-60px] left-[20%] animate-float" style="animation-delay: 5s;"></div>
+    </div>
+
+    <!-- Top Action Bar (Share, QR, Theme) -->
+    <header class="relative z-20 w-full max-w-md mx-auto px-4 pt-5 pb-2">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <button onclick="copyProfileUrl()" class="glass-card hover:bg-white/10 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-sm">
+                    <i class="fa-solid fa-link text-indigo-400"></i>
+                    <span>Salin Link</span>
+                </button>
+                <button onclick="openQrModal()" class="glass-card hover:bg-white/10 text-slate-200 p-2.5 rounded-xl text-xs flex items-center justify-center transition active:scale-95 shadow-sm" title="Tampilkan Kode QR">
+                    <i class="fa-solid fa-qrcode text-sm text-emerald-400"></i>
+                </button>
+            </div>
+
+            <!-- Status Indicator Badge -->
+            <div class="glass-card px-3 py-1.5 rounded-full flex items-center gap-2 text-[11px] font-medium text-slate-300">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>Online & Siap Ngobrol</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="relative z-10 max-w-md mx-auto px-4 py-4 w-full flex-1 flex flex-col justify-center">
+        
+        <!-- Profile Main Card -->
+        <div class="glass-card rounded-[32px] p-6 sm:p-7 shadow-2xl relative overflow-hidden border border-white/10">
+            
+            <!-- Subtle Top Banner Light Effect -->
+            <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-indigo-500/15 via-purple-500/5 to-transparent pointer-events-none"></div>
+
+            <!-- Avatar & Glow -->
+            <div class="relative text-center mb-5">
+                <div class="relative inline-block">
+                    <!-- Glowing aura behind avatar -->
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500 to-emerald-400 blur-md opacity-70 animate-pulse-glow"></div>
+                    
+                    <div class="w-28 h-28 rounded-full p-1 bg-slate-900 border-2 border-white/20 relative mx-auto shadow-xl overflow-hidden">
+                        <img src="https://placehold.co/240x240/0f172a/38bdf8?text=SKY" 
+                             onerror="this.src='https://placehold.co/240x240/0f172a/ffffff?text=Skyice'"
+                             alt="Avatar Skyice" 
+                             class="w-full h-full object-cover rounded-full">
+                    </div>
+                </div>
+
+                <!-- Name & Verified Check -->
+                <div class="flex items-center justify-center gap-1.5 mt-4">
+                    <h1 class="font-display font-extrabold text-2xl tracking-tight text-white">Skyice</h1>
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-sky-500 text-white text-[10px] shadow-sm" title="Terverifikasi">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+                </div>
+
+                <!-- Username Handle -->
+                <p class="text-xs font-semibold text-indigo-400 tracking-wide mt-0.5">@skyice.creator</p>
+
+                <!-- Bio Description -->
+                <p class="text-slate-300 text-sm mt-3 leading-relaxed px-2">
+                    Selamat datang di pusat tautan resmi saya! Temukan server komunitas Discord, grup WhatsApp, atau dukung karya saya melalui Saweria di bawah ini ✨
+                </p>
+            </div>
+
+            <!-- Divider Line -->
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent my-5"></div>
+
+            <!-- 3 Exact Links / Buttons Container -->
+            <div class="space-y-3.5">
+                
+                <!-- 1. DISCORD LINK -->
+                <a href="https://discord.gg/gTYdAY9g2" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="link-card block w-full p-4 rounded-2xl bg-[#5865F2]/15 hover:bg-[#5865F2]/25 border border-[#5865F2]/40 shadow-lg shadow-[#5865F2]/10 flex items-center justify-between group">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="w-12 h-12 rounded-2xl bg-[#5865F2] text-white flex items-center justify-center shrink-0 shadow-md shadow-[#5865F2]/40 group-hover:scale-105 transition">
+                            <i class="fa-brands fa-discord text-xl"></i>
+                        </div>
+                        <div class="min-w-0 text-left">
+                            <div class="flex items-center gap-2">
+                                <span class="font-display font-bold text-sm sm:text-base text-white truncate">Discord Server</span>
+                                <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-[#5865F2]/30 text-indigo-200 border border-[#5865F2]/40">Komunitas</span>
+                            </div>
+                            <p class="text-xs text-slate-300 truncate mt-0.5">Gabung mabar, ngobrol & event seru</p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-slate-300 group-hover:bg-[#5865F2] group-hover:text-white transition">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 2. WHATSAPP GROUP LINK -->
+                <a href="https://chat.whatsapp.com/Cv5HobqlnJa7iVEqOYy4Lu?s=cl&p=a&mlu=4&ilr=4" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="link-card block w-full p-4 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 shadow-lg shadow-emerald-500/10 flex items-center justify-between group">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/40 group-hover:scale-105 transition">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                        </div>
+                        <div class="min-w-0 text-left">
+                            <div class="flex items-center gap-2">
+                                <span class="font-display font-bold text-sm sm:text-base text-white truncate">Grup WhatsApp</span>
+                                <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-emerald-500/30 text-emerald-200 border border-emerald-500/40">Grup Aktif</span>
+                            </div>
+                            <p class="text-xs text-slate-300 truncate mt-0.5">Diskusi cepat & info update harian</p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-slate-300 group-hover:bg-emerald-500 group-hover:text-white transition">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 3. SAWERIA DONATE LINK -->
+                <a href="https://saweria.co/skyice" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="link-card block w-full p-4 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 shadow-lg shadow-amber-500/10 flex items-center justify-between group">
+                    <div class="flex items-center gap-3.5 min-w-0">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-amber-500/40 group-hover:scale-105 transition">
+                            <i class="fa-solid fa-hand-holding-dollar text-lg"></i>
+                        </div>
+                        <div class="min-w-0 text-left">
+                            <div class="flex items-center gap-2">
+                                <span class="font-display font-bold text-sm sm:text-base text-white truncate">Donasi Saweria</span>
+                                <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-amber-500/30 text-amber-200 border border-amber-500/40">Dukung Karya</span>
+                            </div>
+                            <p class="text-xs text-slate-300 truncate mt-0.5">Bantu perkembangan konten & server</p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-slate-300 group-hover:bg-amber-500 group-hover:text-slate-950 transition">
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-6 text-center text-xs text-slate-500">
+        <p>© 2026 Skyice. All rights reserved.</p>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- QR CODE MODAL                              -->
+    <!-- ========================================== -->
+    <div id="qr-modal" onclick="if(event.target === this) closeQrModal()" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-card rounded-3xl max-w-sm w-full p-6 text-center space-y-4 border border-white/15 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-bold text-base text-white">QR Code Profil</h3>
+                <button onclick="closeQrModal()" class="w-8 h-8 rounded-xl bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- QR Code Container -->
+            <div class="p-4 bg-white rounded-2xl inline-block mx-auto shadow-inner">
+                <img id="qr-image" src="" alt="QR Code" class="w-44 h-44 mx-auto rounded-lg" />
+            </div>
+
+            <div>
+                <p class="font-bold text-white text-sm">Skyice Bio Link</p>
+                <p class="text-xs text-slate-400 mt-1">Pindai menggunakan kamera ponsel untuk langsung membuka halaman ini</p>
+            </div>
+
+            <button onclick="copyProfileUrl()" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition">
+                <i class="fa-regular fa-copy"></i> Salin Tautan Profil
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TOAST NOTIFICATION                         -->
+    <!-- ========================================== -->
+    <div id="toast-container" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-4">
+        <div class="px-4 py-2.5 rounded-2xl bg-slate-900 text-white shadow-2xl border border-white/15 flex items-center gap-2.5 text-xs font-semibold">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-message">Tautan berhasil disalin!</span>
+        </div>
+    </div>
+
+    <textarea id="clipboard-helper" class="fixed -top-96 -left-96 opacity-0 pointer-events-none" readonly></textarea>
+
+    <!-- JavaScript Interactions -->
+    <script>
+        function copyProfileUrl() {
+            const urlToCopy = window.location.href;
+            const helper = document.getElementById('clipboard-helper');
+            helper.value = urlToCopy;
+            helper.select();
+            try {
+                document.execCommand('copy');
+                showToast('Link profil berhasil disalin ke clipboard!');
+            } catch (err) {
+                showToast('Gagal menyalin link.');
+            }
+        }
+
+        function openQrModal() {
+            const modal = document.getElementById('qr-modal');
+            const currentUrl = window.location.href;
+            const qrImg = document.getElementById('qr-image');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeQrModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        let toastTimeout = null;
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const msgEl = document.getElementById('toast-message');
+            msgEl.textContent = message;
+
+            container.classList.remove('opacity-0', 'translate-y-4');
+            container.classList.add('opacity-100', 'translate-y-0');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                container.classList.add('opacity-0', 'translate-y-4');
+                container.classList.remove('opacity-100', 'translate-y-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
